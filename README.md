@@ -1,8 +1,9 @@
-# VID × BBM — Credentials 2026
+# VID x BBM Credentials 2026
 
-Scrollable web deck. 34 slides, section sidebar, mobile drawer, tap-to-zoom.
+Interactive credentials deck. Landing page, scrollable slide gallery, and a
+filterable slide viewer over the same 49 slides as the PDF.
 
-**Live:** https://viewsintodollars.github.io/vid-bbm-credentials/
+Built from `clients/jayesh-portfolio/vid-bbm-credentials/explore.py` in the
+VID Ecosystem project. Do not hand-edit here; regenerate and re-push.
 
-Images load lazily, so the page paints immediately instead of waiting on the
-full asset set. `Ctrl+P` prints all slides.
+Unlisted and noindexed: it carries client names, metrics and Frame.io links.
