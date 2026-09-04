@@ -297,9 +297,13 @@ footer h2 span{color:#FDBB8B}
   #scroll{padding:64px 0 72px}.swrap{padding:0 22px}#scroll h2{font-size:32px}
   .shead{flex-direction:column;align-items:flex-start;gap:18px;margin-bottom:26px}
   .sfilter{justify-content:flex-start;max-width:none}
-  .carousel{gap:8px}.arrow{width:40px;height:40px;font-size:19px}
-  .cstage{border-radius:8px}.cdots{max-width:100%;justify-content:flex-start}
-  .cmeta{margin-top:14px}
+  .carousel{display:block;position:relative}
+  .cstage{border-radius:8px;width:100%}
+  .arrow{position:absolute;bottom:-62px;width:46px;height:46px;font-size:21px;
+         background:rgba(255,255,255,.12)}
+  .arrow.prev{left:0}.arrow.next{left:56px}
+  .cmeta{margin-top:76px;flex-direction:column;align-items:flex-start;gap:12px}
+  .cdots{max-width:100%;justify-content:flex-start}
   .fcta{gap:10px}.fcta a{padding:13px 22px;font-size:15px}
 }
 @media(max-width:520px){
