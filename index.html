@@ -256,13 +256,22 @@ body.viewing #exit{display:block}
          text-decoration:underline;text-underline-offset:3px}
 .sfilter{display:flex;gap:7px;flex-wrap:wrap;max-width:620px;justify-content:flex-end}
 .sfilter .chip{font-size:12.5px}
-.sgal{display:flex;flex-direction:column;gap:26px}
-.sgal figure{margin:0;scroll-margin-top:20px}
-.sgal img{width:100%;display:block;border-radius:12px;background:#fff;
-          box-shadow:0 8px 30px rgba(0,0,0,.35)}
-.sgal figcaption{font-size:13px;color:rgba(255,255,255,.4);margin-top:9px;
-                 display:flex;gap:10px;align-items:center}
-.sgal figcaption b{color:rgba(255,255,255,.75);font-weight:500}
+.carousel{display:flex;align-items:center;gap:18px}
+.cstage{flex:1;min-width:0;aspect-ratio:16/9;background:#fff;border-radius:12px;overflow:hidden;
+        box-shadow:0 14px 46px rgba(0,0,0,.4)}
+.cstage img{width:100%;height:100%;object-fit:contain;display:block}
+.arrow{flex:0 0 auto;width:52px;height:52px;border-radius:50%;cursor:pointer;font-size:23px;
+       background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);color:#fff;
+       display:flex;align-items:center;justify-content:center;transition:background .14s}
+.arrow:hover{background:rgba(255,255,255,.2)}
+.arrow:disabled{opacity:.25;cursor:default}
+.cmeta{display:flex;justify-content:space-between;align-items:center;gap:22px;margin-top:18px;flex-wrap:wrap}
+.cmeta b{font-size:17px;font-weight:600;display:block}
+.cmeta span{font-size:13.5px;color:rgba(255,255,255,.42)}
+.cdots{display:flex;gap:5px;flex-wrap:wrap;max-width:60%;justify-content:flex-end}
+.cdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.22);border:none;
+      padding:0;cursor:pointer}
+.cdot.on{background:#FC5101;transform:scale(1.25)}
 .snone{color:rgba(255,255,255,.45);padding:40px 0;font-size:16px}
 
 footer{background:#131316;color:#fff;padding:96px 0 80px}
@@ -288,7 +297,9 @@ footer h2 span{color:#FDBB8B}
   #scroll{padding:64px 0 72px}.swrap{padding:0 22px}#scroll h2{font-size:32px}
   .shead{flex-direction:column;align-items:flex-start;gap:18px;margin-bottom:26px}
   .sfilter{justify-content:flex-start;max-width:none}
-  .sgal{gap:18px}.sgal img{border-radius:8px}
+  .carousel{gap:8px}.arrow{width:40px;height:40px;font-size:19px}
+  .cstage{border-radius:8px}.cdots{max-width:100%;justify-content:flex-start}
+  .cmeta{margin-top:14px}
   .fcta{gap:10px}.fcta a{padding:13px 22px;font-size:15px}
 }
 @media(max-width:520px){
@@ -328,12 +339,20 @@ footer h2 span{color:#FDBB8B}
     <div class="shead">
       <div>
         <h2>The work</h2>
-        <p>Scroll through every slide, or <button id="opendeck" class="linkish">open the deck</button>
-           to filter by industry and jump around.</p>
+        <p>Arrow through every slide, or <button id="opendeck" class="linkish">open full screen</button>
+           for search and jump-to-brand.</p>
       </div>
       <div class="sfilter" id="sfilter"></div>
     </div>
-    <div id="sgal" class="sgal"></div>
+    <div class="carousel">
+      <button class="arrow prev" id="cprev" aria-label="Previous slide">&#8249;</button>
+      <div class="cstage"><img id="cimg" alt="" loading="eager"></div>
+      <button class="arrow next" id="cnext" aria-label="Next slide">&#8250;</button>
+    </div>
+    <div class="cmeta">
+      <div><b id="cname"></b><span id="cpos"></span></div>
+      <div class="cdots" id="cdots"></div>
+    </div>
   </div>
 </section>
 
@@ -939,34 +958,74 @@ footer h2 span{color:#FDBB8B}
 
 <script>
 (function(){
-  var GAL = ["assets/slide-01.jpg", "assets/slide-02.jpg", "assets/slide-03.jpg", "assets/slide-04.jpg", "assets/slide-05.jpg", "assets/slide-06.jpg", "assets/slide-07.jpg", "assets/slide-08.jpg", "assets/slide-09.jpg", "assets/slide-10.jpg", "assets/slide-11.jpg", "assets/slide-12.jpg", "assets/slide-13.jpg", "assets/slide-14.jpg", "assets/slide-15.jpg", "assets/slide-16.jpg", "assets/slide-17.jpg", "assets/slide-18.jpg", "assets/slide-19.jpg", "assets/slide-20.jpg", "assets/slide-21.jpg", "assets/slide-22.jpg", "assets/slide-23.jpg", "assets/slide-24.jpg", "assets/slide-25.jpg", "assets/slide-26.jpg", "assets/slide-27.jpg", "assets/slide-28.jpg", "assets/slide-29.jpg", "assets/slide-30.jpg", "assets/slide-31.jpg", "assets/slide-32.jpg", "assets/slide-33.jpg", "assets/slide-34.jpg", "assets/slide-35.jpg", "assets/slide-36.jpg", "assets/slide-37.jpg", "assets/slide-38.jpg", "assets/slide-39.jpg", "assets/slide-40.jpg", "assets/slide-41.jpg", "assets/slide-42.jpg", "assets/slide-43.jpg", "assets/slide-44.jpg", "assets/slide-45.jpg", "assets/slide-46.jpg", "assets/slide-47.jpg", "assets/slide-48.jpg", "assets/slide-49.jpg"], MAP = ["Overview", "Clients", "Sahaj Talwar", "Sahaj Talwar", "Sahaj Talwar", "Sahaj Talwar", "Scuderia Ferrari \u00d7 ZCG \u00d7 Silver Sevens", "Scuderia Ferrari \u00d7 ZCG \u00d7 Silver Sevens", "PhonePe", "Epigamia", "FIFA 26", "FIFA 26", "FIFA 26", "Right Now With Rohan", "Right Now With Rohan", "Right Now With Rohan", "The Actor&#x27;s Truth", "The Actor&#x27;s Truth", "Expert Panel", "Expert Panel", "Expert Panel", "Preparoo", "Preparoo", "Devraj Pant", "Devraj Pant", "Clairon AI", "Rawa", "Livechance", "Deconstruct", "Deconstruct", "Scrub Story", "Scrub Story", "House of Veda", "House of Veda", "Atharva Oceana", "Atharva Oceana", "Janma Care", "Janma Care", "Nutriosa", "Nutriosa", "Revyur", "Revyur", "Renv8 Spaces", "Renv8 Spaces", "La Selva Pench", "La Selva Pench", "Offerings", "Contact", "Contact"], ENTRIES = [{"name": "Cover", "slide": 1, "sector": "", "industry": null, "services": [], "count": 1}, {"name": "Clients", "slide": 2, "sector": "", "industry": null, "services": [], "count": 1}, {"name": "Sahaj Talwar", "slide": 3, "sector": "Creator \u00b7 Self-Improvement and Life Coaching", "industry": "Creator and personal brand", "services": ["Content strategy"], "count": 4}, {"name": "Scuderia Ferrari \u00d7 ZCG \u00d7 Silver Sevens", "slide": 7, "sector": "Motorsport \u00b7 Las Vegas Grand Prix", "industry": "Sport and entertainment", "services": ["Video production"], "count": 2}, {"name": "PhonePe", "slide": 9, "sector": "Fintech \u00b7 Campaign Film", "industry": "Finance and fintech", "services": ["Video production"], "count": 1}, {"name": "Epigamia", "slide": 10, "sector": "D2C \u00b7 Food and Beverage", "industry": "D2C and retail", "services": ["Video production"], "count": 1}, {"name": "FIFA 26", "slide": 11, "sector": "Sport \u00b7 FIFA World Cup 26 Broadcast", "industry": "Sport and entertainment", "services": ["Video production"], "count": 3}, {"name": "Right Now With Rohan", "slide": 14, "sector": "Podcast \u00b7 Hindi Long-Form", "industry": "Creator and personal brand", "services": ["Content strategy", "Social media"], "count": 3}, {"name": "The Actor's Truth", "slide": 17, "sector": "Education \u00b7 Acting Course", "industry": "Education and edtech", "services": ["Performance ads", "Scripting"], "count": 1}, {"name": "Expert Panel", "slide": 19, "sector": "Financial Services \u00b7 Debt Resolution", "industry": "Finance and fintech", "services": ["Content strategy", "Social media"], "count": 3}, {"name": "Preparoo", "slide": 22, "sector": "EdTech \u00b7 Exam Prep Community", "industry": "Education and edtech", "services": ["Video production", "Performance ads"], "count": 2}, {"name": "Devraj Pant", "slide": 24, "sector": "Creator \u00b7 Finance and Founder Content", "industry": "Creator and personal brand", "services": ["Video production"], "count": 2}, {"name": "Clairon AI", "slide": 26, "sector": "SaaS \u00b7 Product Explainer", "industry": "SaaS and product", "services": ["Motion design"], "count": 1}, {"name": "Rawa", "slide": 27, "sector": "Product Explainer", "industry": "SaaS and product", "services": ["Motion design"], "count": 1}, {"name": "Livechance", "slide": 28, "sector": "App \u00b7 Product Explainer", "industry": "SaaS and product", "services": ["Motion design"], "count": 1}, {"name": "Deconstruct", "slide": 29, "sector": "Skincare \u00b7 D2C Performance", "industry": "D2C and retail", "services": ["Video production", "Performance ads", "Graphic design"], "count": 2}, {"name": "Scrub Story", "slide": 31, "sector": "Apparel \u00b7 Medical Scrubs D2C", "industry": "D2C and retail", "services": ["Video production", "Graphic design"], "count": 2}, {"name": "House of Veda", "slide": 33, "sector": "D2C \u00b7 Organic Food and Ayurvedic Wellness", "industry": "D2C and retail", "services": ["Performance ads", "Graphic design"], "count": 2}, {"name": "Atharva Oceana", "slide": 35, "sector": "Real Estate \u00b7 Luxury Residential", "industry": "Real estate and interiors", "services": ["Other"], "count": 2}, {"name": "Janma Care", "slide": 37, "sector": "Baby Skincare \u00b7 D2C", "industry": "D2C and retail", "services": ["Social media"], "count": 2}, {"name": "Nutriosa", "slide": 39, "sector": "Nutrition \u00b7 Supplements", "industry": "D2C and retail", "services": ["Content strategy"], "count": 2}, {"name": "Revyur", "slide": 41, "sector": "Skincare \u00b7 Science-Backed", "industry": "D2C and retail", "services": ["Content strategy"], "count": 2}, {"name": "Renv8 Spaces", "slide": 43, "sector": "Interior Design \u00b7 Premium", "industry": "Real estate and interiors", "services": ["Social media"], "count": 2}, {"name": "La Selva Pench", "slide": 45, "sector": "Hospitality \u00b7 Luxury Resort", "industry": "Hospitality and travel", "services": ["Content strategy"], "count": 2}, {"name": "What we do", "slide": 47, "sector": "", "industry": null, "services": [], "count": 1}, {"name": "Contact", "slide": 48, "sector": "", "industry": null, "services": [], "count": 1}];
-  var sel = new Set();
-  function secOf(n){ var cur = null; ENTRIES.forEach(function(e){ if (e.slide <= n) cur = e; }); return cur; }
-  function render(){
-    var html = "";
-    GAL.forEach(function(src, i){
-      var n = i + 1, e = secOf(n);
+  var GAL = ["assets/slide-01.jpg", "assets/slide-02.jpg", "assets/slide-03.jpg", "assets/slide-04.jpg", "assets/slide-05.jpg", "assets/slide-06.jpg", "assets/slide-07.jpg", "assets/slide-08.jpg", "assets/slide-09.jpg", "assets/slide-10.jpg", "assets/slide-11.jpg", "assets/slide-12.jpg", "assets/slide-13.jpg", "assets/slide-14.jpg", "assets/slide-15.jpg", "assets/slide-16.jpg", "assets/slide-17.jpg", "assets/slide-18.jpg", "assets/slide-19.jpg", "assets/slide-20.jpg", "assets/slide-21.jpg", "assets/slide-22.jpg", "assets/slide-23.jpg", "assets/slide-24.jpg", "assets/slide-25.jpg", "assets/slide-26.jpg", "assets/slide-27.jpg", "assets/slide-28.jpg", "assets/slide-29.jpg", "assets/slide-30.jpg", "assets/slide-31.jpg", "assets/slide-32.jpg", "assets/slide-33.jpg", "assets/slide-34.jpg", "assets/slide-35.jpg", "assets/slide-36.jpg", "assets/slide-37.jpg", "assets/slide-38.jpg", "assets/slide-39.jpg", "assets/slide-40.jpg", "assets/slide-41.jpg", "assets/slide-42.jpg", "assets/slide-43.jpg", "assets/slide-44.jpg", "assets/slide-45.jpg", "assets/slide-46.jpg", "assets/slide-47.jpg", "assets/slide-48.jpg", "assets/slide-49.jpg"], ENTRIES = [{"name": "Cover", "slide": 1, "sector": "", "industry": null, "services": [], "count": 1}, {"name": "Clients", "slide": 2, "sector": "", "industry": null, "services": [], "count": 1}, {"name": "Sahaj Talwar", "slide": 3, "sector": "Creator \u00b7 Self-Improvement and Life Coaching", "industry": "Creator and personal brand", "services": ["Content strategy"], "count": 4}, {"name": "Scuderia Ferrari \u00d7 ZCG \u00d7 Silver Sevens", "slide": 7, "sector": "Motorsport \u00b7 Las Vegas Grand Prix", "industry": "Sport and entertainment", "services": ["Video production"], "count": 2}, {"name": "PhonePe", "slide": 9, "sector": "Fintech \u00b7 Campaign Film", "industry": "Finance and fintech", "services": ["Video production"], "count": 1}, {"name": "Epigamia", "slide": 10, "sector": "D2C \u00b7 Food and Beverage", "industry": "D2C and retail", "services": ["Video production"], "count": 1}, {"name": "FIFA 26", "slide": 11, "sector": "Sport \u00b7 FIFA World Cup 26 Broadcast", "industry": "Sport and entertainment", "services": ["Video production"], "count": 3}, {"name": "Right Now With Rohan", "slide": 14, "sector": "Podcast \u00b7 Hindi Long-Form", "industry": "Creator and personal brand", "services": ["Content strategy", "Social media"], "count": 3}, {"name": "The Actor's Truth", "slide": 17, "sector": "Education \u00b7 Acting Course", "industry": "Education and edtech", "services": ["Performance ads", "Scripting"], "count": 1}, {"name": "Expert Panel", "slide": 19, "sector": "Financial Services \u00b7 Debt Resolution", "industry": "Finance and fintech", "services": ["Content strategy", "Social media"], "count": 3}, {"name": "Preparoo", "slide": 22, "sector": "EdTech \u00b7 Exam Prep Community", "industry": "Education and edtech", "services": ["Video production", "Performance ads"], "count": 2}, {"name": "Devraj Pant", "slide": 24, "sector": "Creator \u00b7 Finance and Founder Content", "industry": "Creator and personal brand", "services": ["Video production"], "count": 2}, {"name": "Clairon AI", "slide": 26, "sector": "SaaS \u00b7 Product Explainer", "industry": "SaaS and product", "services": ["Motion design"], "count": 1}, {"name": "Rawa", "slide": 27, "sector": "Product Explainer", "industry": "SaaS and product", "services": ["Motion design"], "count": 1}, {"name": "Livechance", "slide": 28, "sector": "App \u00b7 Product Explainer", "industry": "SaaS and product", "services": ["Motion design"], "count": 1}, {"name": "Deconstruct", "slide": 29, "sector": "Skincare \u00b7 D2C Performance", "industry": "D2C and retail", "services": ["Video production", "Performance ads", "Graphic design"], "count": 2}, {"name": "Scrub Story", "slide": 31, "sector": "Apparel \u00b7 Medical Scrubs D2C", "industry": "D2C and retail", "services": ["Video production", "Graphic design"], "count": 2}, {"name": "House of Veda", "slide": 33, "sector": "D2C \u00b7 Organic Food and Ayurvedic Wellness", "industry": "D2C and retail", "services": ["Performance ads", "Graphic design"], "count": 2}, {"name": "Atharva Oceana", "slide": 35, "sector": "Real Estate \u00b7 Luxury Residential", "industry": "Real estate and interiors", "services": ["Other"], "count": 2}, {"name": "Janma Care", "slide": 37, "sector": "Baby Skincare \u00b7 D2C", "industry": "D2C and retail", "services": ["Social media"], "count": 2}, {"name": "Nutriosa", "slide": 39, "sector": "Nutrition \u00b7 Supplements", "industry": "D2C and retail", "services": ["Content strategy"], "count": 2}, {"name": "Revyur", "slide": 41, "sector": "Skincare \u00b7 Science-Backed", "industry": "D2C and retail", "services": ["Content strategy"], "count": 2}, {"name": "Renv8 Spaces", "slide": 43, "sector": "Interior Design \u00b7 Premium", "industry": "Real estate and interiors", "services": ["Social media"], "count": 2}, {"name": "La Selva Pench", "slide": 45, "sector": "Hospitality \u00b7 Luxury Resort", "industry": "Hospitality and travel", "services": ["Content strategy"], "count": 2}, {"name": "What we do", "slide": 47, "sector": "", "industry": null, "services": [], "count": 1}, {"name": "Contact", "slide": 48, "sector": "", "industry": null, "services": [], "count": 1}];
+  var view = [], i = 0, sel = new Set();
+  function secOf(n){ var cur=null; ENTRIES.forEach(function(e){ if(e.slide<=n) cur=e; }); return cur; }
+  function build(){
+    view = [];
+    GAL.forEach(function(src, k){
+      var n = k+1, e = secOf(n);
       if (sel.size && (!e || !e.industry || !sel.has(e.industry))) return;
-      html += '<figure id="s' + n + '"><img loading="lazy" src="' + src + '" alt="Slide ' + n + '">' +
-              '<figcaption><b>' + (e ? e.name : '') + '</b><span>Slide ' + n + ' of ' + GAL.length + '</span>' +
-              '</figcaption></figure>';
+      view.push({src:src, n:n, name:e?e.name:''});
     });
-    document.getElementById('sgal').innerHTML = html ||
-      '<div class="snone">Nothing matches that filter.</div>';
+    i = 0; paint();
   }
-  var inds = [];
-  ENTRIES.forEach(function(e){ if (e.industry && inds.indexOf(e.industry) < 0) inds.push(e.industry); });
-  document.getElementById('sfilter').innerHTML =
-    inds.sort().map(function(v){
-      return '<button class="chip" aria-pressed="false" data-v="' + v + '">' + v + '</button>'; }).join('');
+  function paint(){
+    var stage = document.querySelector('.cstage'), meta = document.querySelector('.cmeta');
+    if (!view.length){
+      stage.innerHTML = '<div class="snone" style="padding:40px;color:#888">Nothing matches that filter.</div>';
+      meta.style.display = 'none'; return;
+    }
+    meta.style.display = 'flex';
+    var v = view[i];
+    stage.innerHTML = '<img id="cimg" src="'+v.src+'" alt="Slide '+v.n+'">';
+    document.getElementById('cname').textContent = v.name;
+    document.getElementById('cpos').textContent = 'Slide '+v.n+'  ·  '+(i+1)+' of '+view.length;
+    document.getElementById('cprev').disabled = i===0;
+    document.getElementById('cnext').disabled = i===view.length-1;
+    document.getElementById('cdots').innerHTML = view.map(function(_,k){
+      return '<button class="cdot'+(k===i?' on':'')+'" data-k="'+k+'" aria-label="Slide '+(k+1)+'"></button>';
+    }).join('');
+    // preload neighbours so arrowing feels instant
+    [i-1,i+1].forEach(function(k){ if(view[k]){ var im=new Image(); im.src=view[k].src; } });
+  }
+  function go(d){ var n=i+d; if(n>=0 && n<view.length){ i=n; paint(); } }
+  document.getElementById('cprev').onclick = function(){ go(-1); };
+  document.getElementById('cnext').onclick = function(){ go(1); };
+  document.getElementById('cdots').addEventListener('click', function(e){
+    var b=e.target.closest('.cdot'); if(b){ i=+b.dataset.k; paint(); }
+  });
+  // arrow keys when the carousel is on screen and the deck is closed
+  document.addEventListener('keydown', function(e){
+    if (document.body.classList.contains('viewing') || e.target.tagName==='INPUT') return;
+    var r = document.getElementById('scroll').getBoundingClientRect();
+    if (r.top > window.innerHeight || r.bottom < 0) return;
+    if (e.key==='ArrowRight'){ e.preventDefault(); go(1); }
+    if (e.key==='ArrowLeft'){ e.preventDefault(); go(-1); }
+  });
+  var x0=null, stage=document.querySelector('.cstage');
+  stage.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  stage.addEventListener('touchend',function(e){
+    if(x0===null) return;
+    var dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>45) go(dx<0?1:-1);
+    x0=null;
+  },{passive:true});
+  var inds=[];
+  ENTRIES.forEach(function(e){ if(e.industry && inds.indexOf(e.industry)<0) inds.push(e.industry); });
+  document.getElementById('sfilter').innerHTML = inds.sort().map(function(v){
+    return '<button class="chip" aria-pressed="false" data-v="'+v+'">'+v+'</button>'; }).join('');
   document.getElementById('sfilter').addEventListener('click', function(ev){
-    var b = ev.target.closest('.chip'); if (!b) return;
-    var v = b.dataset.v, on = b.getAttribute('aria-pressed') === 'true';
+    var b=ev.target.closest('.chip'); if(!b) return;
+    var v=b.dataset.v, on=b.getAttribute('aria-pressed')==='true';
     b.setAttribute('aria-pressed', String(!on));
     on ? sel.delete(v) : sel.add(v);
-    render();
+    build();
   });
-  render();
+  document.getElementById('opendeck').onclick = function(){
+    document.getElementById('browse').click();
+  };
+  build();
 })();
 </script>
 </body>
